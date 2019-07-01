@@ -80,17 +80,17 @@ Running tests
 History
 -------
 
-Review and update this section.
-This library was first introduced in [MediaWiki 1.16][] ([r52203][]). It was
-split out of the MediaWiki codebase and published as an independent library
-during the [MediaWiki 1.25][] development cycle.
+This library was first introduced in [MediaWiki 1.27][] ([I3c25c0ac17][]). It
+was split out of the MediaWiki codebase and published as an independent library
+during the [MediaWiki 1.33][] and [MediaWiki 1.34][] development cycles.
 
 
 ---
 [PSR-11]: https://www.php-fig.org/psr/psr-11/
-[MediaWiki 1.16]: https://www.mediawiki.org/wiki/MediaWiki_1.16
-[r52203]: https://www.mediawiki.org/wiki/Special:Code/MediaWiki/52203
-[MediaWiki 1.25]: https://www.mediawiki.org/wiki/MediaWiki_1.25
+[MediaWiki 1.27]: https://www.mediawiki.org/wiki/MediaWiki_1.27
+[I3c25c0ac17]: https://gerrit.wikimedia.org/r/264403
+[MediaWiki 1.33]: https://www.mediawiki.org/wiki/MediaWiki_1.33
+[MediaWiki 1.34]: https://www.mediawiki.org/wiki/MediaWiki_1.34
 [Latest Stable Version]: https://poser.pugx.org/wikimedia/services/v/stable.svg
 [License]: https://poser.pugx.org/wikimedia/services/license.svg
 
