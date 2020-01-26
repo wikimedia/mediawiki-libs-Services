@@ -30,7 +30,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services = $this->newServiceContainer();
 		$names = $services->getServiceNames();
 
-		$this->assertInternalType( 'array', $names );
+		$this->assertIsArray( $names );
 		$this->assertEmpty( $names );
 
 		$name = 'TestService92834576';
@@ -108,8 +108,8 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		// trigger instantiation of Foo
 		$services->getService( 'Foo' );
 
-		$this->assertInternalType(
-			'object',
+		$this->assertIsObject(
+
 			$services->peekService( 'Foo' ),
 			'Peek should return the service object if it had been accessed before.'
 		);
