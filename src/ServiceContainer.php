@@ -40,8 +40,8 @@ use Wikimedia\ScopedCallback;
  * getter methods with more meaningful names and more specific return type
  * declarations.
  *
- * @see docs/injection.txt for an overview of using dependency injection in the
- *      MediaWiki code base.
+ * @see MediaWiki core's docs/Injection.md for an overview of using dependency
+ *      injection in that code base.
  */
 class ServiceContainer implements ContainerInterface, DestructibleService {
 
