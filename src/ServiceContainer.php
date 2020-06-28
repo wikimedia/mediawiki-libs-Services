@@ -428,13 +428,14 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @param string $name
 	 *
 	 * @throws InvalidArgumentException if $name is not a known service.
-	 * @throws RuntimeException if a circular dependency is detected.
+	 * @throws RecursiveServiceDependencyException if a circular dependency is detected.
 	 * @return object
 	 */
 	private function createService( $name ) {
 		if ( isset( $this->serviceInstantiators[$name] ) ) {
 			if ( isset( $this->servicesBeingCreated[$name] ) ) {
-				throw new RuntimeException( "Circular dependency when creating service! " .
+				throw new RecursiveServiceDependencyException(
+					"Circular dependency when creating service! " .
 					implode( ' -> ', array_keys( $this->servicesBeingCreated ) ) . " -> $name" );
 			}
 			$this->servicesBeingCreated[$name] = true;

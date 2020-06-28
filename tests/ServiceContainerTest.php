@@ -1,5 +1,6 @@
 <?php
 
+use Wikimedia\Services\RecursiveServiceDependencyException;
 use Wikimedia\Services\ServiceContainer;
 
 /**
@@ -96,12 +97,14 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$exceptionThrown = false;
 		try {
 			$services->getService( 'service1' );
-		} catch ( RuntimeException $e ) {
+		} catch ( RecursiveServiceDependencyException $e ) {
 			$exceptionThrown = true;
-			$this->assertSame( 'Circular dependency when creating service! ' .
+			$this->assertSame(
+				'Recursive service instantiation: ' .
+				'Circular dependency when creating service! ' .
 				'service1 -> service2 -> service3 -> service1', $e->getMessage() );
 		}
-		$this->assertTrue( $exceptionThrown, 'RuntimeException must be thrown' );
+		$this->assertTrue( $exceptionThrown, 'RecursiveServiceDependencyException must be thrown' );
 	}
 
 	public function testGetService_fail_unknown() {
