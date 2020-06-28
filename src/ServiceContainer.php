@@ -246,9 +246,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @throws RuntimeException if there is already a service registered as $name.
 	 */
-	public function defineService( $name, callable $instantiator ) {
-		Assert::parameterType( 'string', $name, '$name' );
-
+	public function defineService( string $name, callable $instantiator ) {
 		if ( $this->hasService( $name ) ) {
 			throw new ServiceAlreadyDefinedException( $name );
 		}
@@ -275,9 +273,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @throws NoSuchServiceException if $name is not a known service.
 	 * @throws CannotReplaceActiveServiceException if the service was already instantiated.
 	 */
-	public function redefineService( $name, callable $instantiator ) {
-		Assert::parameterType( 'string', $name, '$name' );
-
+	public function redefineService( string $name, callable $instantiator ) {
 		if ( !$this->hasService( $name ) ) {
 			throw new NoSuchServiceException( $name );
 		}
@@ -316,9 +312,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @throws NoSuchServiceException if $name is not a known service.
 	 * @throws CannotReplaceActiveServiceException if the service was already instantiated.
 	 */
-	public function addServiceManipulator( $name, callable $manipulator ) {
-		Assert::parameterType( 'string', $name, '$name' );
-
+	public function addServiceManipulator( string $name, callable $manipulator ) {
 		if ( !$this->hasService( $name ) ) {
 			throw new NoSuchServiceException( $name );
 		}
@@ -378,9 +372,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @throws RuntimeException if $name is not a known service.
 	 */
-	final protected function resetService( $name, $destroy = true ) {
-		Assert::parameterType( 'string', $name, '$name' );
-
+	final protected function resetService( string $name, $destroy = true ) {
 		$instance = $this->peekService( $name );
 
 		if ( $destroy && $instance instanceof DestructibleService ) {
