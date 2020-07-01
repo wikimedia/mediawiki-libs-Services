@@ -2,7 +2,7 @@
 	"name": "wikimedia/services",
 	"description": "Generic service to manage named services using lazy instantiation based on instantiator callback functions",
 	"license": "GPL-2.0-or-later",
-	"homepage": "https://www.mediawiki.org/wiki/Services",
+	"homepage": "https://www.mediawiki.org/wiki/Services_(PHP_library)",
 	"authors": [
 		{
 			"name": "Daniel Kinzler",
