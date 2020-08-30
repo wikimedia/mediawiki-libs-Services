@@ -23,9 +23,9 @@
 namespace Wikimedia\Services;
 
 use InvalidArgumentException;
+use LogicException;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
-use Wikimedia\Assert\Assert;
 use Wikimedia\ScopedCallback;
 
 /**
@@ -124,10 +124,9 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 			// the wiring file is required to return an array of instantiators.
 			$wiring = require $file;
 
-			Assert::postcondition(
-				is_array( $wiring ),
-				"Wiring file $file is expected to return an array!"
-			);
+			if ( !is_array( $wiring ) ) {
+				throw new LogicException( "Wiring file $file must return an array" );
+			}
 
 			$this->applyWiring( $wiring );
 		}
@@ -136,12 +135,10 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	/**
 	 * Registers multiple services (aka a "wiring").
 	 *
-	 * @param array $serviceInstantiators An associative array mapping service names to
+	 * @param callable[] $serviceInstantiators An associative array mapping service names to
 	 *        instantiator functions.
 	 */
 	public function applyWiring( array $serviceInstantiators ) {
-		Assert::parameterElementType( 'callable', $serviceInstantiators, '$serviceInstantiators' );
-
 		foreach ( $serviceInstantiators as $name => $instantiator ) {
 			$this->defineService( $name, $instantiator );
 		}

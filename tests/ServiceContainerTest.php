@@ -209,6 +209,20 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$this->assertSame( 'Bar!', $services->getService( 'Bar' ) );
 	}
 
+	public function testApplyWiring_fail_nonfunction() {
+		$services = $this->newServiceContainer();
+
+		$wiring = [
+			'Foo' => function () {
+				return 'Foo!';
+			},
+			'Bar' => 'not a function',
+		];
+
+		$this->expectException( \TypeError::class );
+		$services->applyWiring( $wiring );
+	}
+
 	public function testImportWiring() {
 		$services = $this->newServiceContainer();
 
@@ -300,6 +314,18 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		// loading the same file twice should fail, because
 		$this->setExpectedException( Wikimedia\Services\ServiceAlreadyDefinedException::class );
 
+		$services->loadWiringFiles( $wiringFiles );
+	}
+
+	public function testLoadWiringFiles_fail_nonarray() {
+		$services = $this->newServiceContainer();
+
+		$wiringFiles = [
+			__DIR__ . '/TestWiring3.php',
+		];
+
+		$this->expectException( \LogicException::class );
+		$this->expectExceptionMessage( 'must return an array' );
 		$services->loadWiringFiles( $wiringFiles );
 	}
 
