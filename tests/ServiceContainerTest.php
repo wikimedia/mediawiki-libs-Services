@@ -53,7 +53,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 			function ( $actualLocator, $extra ) use ( $services, $theService, &$count ) {
 				$count++;
 				$this->assertSame( $services, $actualLocator );
-				$this->assertSame( $extra, 'Foo' );
+				$this->assertSame( 'Foo', $extra );
 				return $theService;
 			}
 		);
