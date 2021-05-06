@@ -426,42 +426,41 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @throws RecursiveServiceDependencyException if a circular dependency is detected.
 	 * @return object
 	 */
-	private function createService( $name ) {
-		if ( isset( $this->serviceInstantiators[$name] ) ) {
-			if ( isset( $this->servicesBeingCreated[$name] ) ) {
-				throw new RecursiveServiceDependencyException(
-					"Circular dependency when creating service! " .
-					implode( ' -> ', array_keys( $this->servicesBeingCreated ) ) . " -> $name" );
-			}
-			$this->servicesBeingCreated[$name] = true;
-			$removeFromStack = new ScopedCallback( function () use ( $name ) {
-				unset( $this->servicesBeingCreated[$name] );
-			} );
-			$service = ( $this->serviceInstantiators[$name] )(
-				$this,
-				...$this->extraInstantiationParams
-			);
-
-			if ( isset( $this->serviceManipulators[$name] ) ) {
-				foreach ( $this->serviceManipulators[$name] as $callback ) {
-					$ret = call_user_func_array(
-						$callback,
-						array_merge( [ $service, $this ], $this->extraInstantiationParams )
-					);
-
-					// If the manipulator callback returns an object, that object replaces
-					// the original service instance. This allows the manipulator to wrap
-					// or fully replace the service.
-					if ( $ret !== null ) {
-						$service = $ret;
-					}
-				}
-			}
-			$removeFromStack->consume();
-			// NOTE: when adding more wiring logic here, make sure importWiring() is kept in sync!
-		} else {
+	private function createService( string $name ) {
+		if ( !isset( $this->serviceInstantiators[$name] ) ) {
 			throw new NoSuchServiceException( $name );
 		}
+
+		if ( isset( $this->servicesBeingCreated[$name] ) ) {
+			throw new RecursiveServiceDependencyException(
+				"Circular dependency when creating service! " .
+				implode( ' -> ', array_keys( $this->servicesBeingCreated ) ) . " -> $name" );
+		}
+
+		$this->servicesBeingCreated[$name] = true;
+		$removeFromStack = new ScopedCallback( function () use ( $name ) {
+			unset( $this->servicesBeingCreated[$name] );
+		} );
+
+		$service = ( $this->serviceInstantiators[$name] )(
+			$this,
+			...$this->extraInstantiationParams
+		);
+		if ( isset( $this->serviceManipulators[$name] ) ) {
+			foreach ( $this->serviceManipulators[$name] as $manipulator ) {
+				$ret = $manipulator( $service, $this, ...$this->extraInstantiationParams );
+
+				// If the manipulator callback returns an object, that object replaces
+				// the original service instance. This allows the manipulator to wrap
+				// or fully replace the service.
+				if ( $ret !== null ) {
+					$service = $ret;
+				}
+			}
+		}
+
+		$removeFromStack->consume();
+		// NOTE: when adding more wiring logic here, make sure importWiring() is kept in sync!
 
 		return $service;
 	}
