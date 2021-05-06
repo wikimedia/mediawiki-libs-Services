@@ -22,7 +22,6 @@
 
 namespace Wikimedia\Services;
 
-use InvalidArgumentException;
 use LogicException;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -61,7 +60,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	private $serviceManipulators = [];
 
 	/**
-	 * @var bool[] disabled status, per service name
+	 * @var true[] Set of services that got disabled via {@see disableService}
 	 */
 	private $disabled = [];
 
@@ -76,7 +75,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	private $destroyed = false;
 
 	/**
-	 * @var array Set of services currently being created, to detect loops
+	 * @var true[] Set of services currently being created, to detect loops
 	 */
 	private $servicesBeingCreated = [];
 
@@ -95,7 +94,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * instance unusable. In particular, this will disable access to the storage backend
 	 * via any of these services. Any future call to getService() will throw an exception.
 	 *
-	 * @see resetGlobalInstance()
+	 * @see MediaWikiServices::resetGlobalInstance()
 	 */
 	public function destroy() {
 		foreach ( $this->getServiceNames() as $name ) {
@@ -115,7 +114,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	}
 
 	/**
-	 * @param array $wiringFiles A list of PHP files to load wiring information from.
+	 * @param string[] $wiringFiles A list of PHP files to load wiring information from.
 	 * Each file is loaded using PHP's include mechanism. Each file is expected to
 	 * return an associative array that maps service names to instantiator functions.
 	 */
@@ -397,7 +396,6 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @throws NoSuchServiceException if $name is not a known service.
 	 * @throws ContainerDisabledException if this container has already been destroyed.
 	 * @throws ServiceDisabledException if the requested service has been disabled.
-	 *
 	 * @return mixed The service instance
 	 */
 	public function getService( $name ) {
@@ -424,7 +422,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	/**
 	 * @param string $name
 	 *
-	 * @throws InvalidArgumentException if $name is not a known service.
+	 * @throws NoSuchServiceException if $name is not a known service.
 	 * @throws RecursiveServiceDependencyException if a circular dependency is detected.
 	 * @return object
 	 */
