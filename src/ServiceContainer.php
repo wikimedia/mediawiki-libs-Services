@@ -45,7 +45,7 @@ use Wikimedia\ScopedCallback;
 class ServiceContainer implements ContainerInterface, DestructibleService {
 
 	/**
-	 * @var object[]
+	 * @var mixed[]
 	 */
 	private $services = [];
 
@@ -153,7 +153,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @param ServiceContainer $container
 	 * @param string[] $skip A list of service names to skip during import
 	 */
-	public function importWiring( ServiceContainer $container, $skip = [] ) {
+	public function importWiring( ServiceContainer $container, array $skip = [] ) {
 		$newInstantiators = array_diff_key(
 			$container->serviceInstantiators,
 			array_flip( $skip )
@@ -189,12 +189,12 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @return bool
 	 */
-	public function hasService( $name ) {
+	public function hasService( string $name ): bool {
 		return isset( $this->serviceInstantiators[$name] );
 	}
 
 	/** @inheritDoc */
-	public function has( $name ) {
+	public function has( string $name ) {
 		return $this->hasService( $name );
 	}
 
@@ -210,10 +210,10 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @param string $name
 	 *
-	 * @return object|null The service instance, or null if the service has not yet been instantiated.
+	 * @return mixed|null The service instance, or null if the service has not yet been instantiated.
 	 * @throws RuntimeException if $name does not refer to a known service.
 	 */
-	public function peekService( $name ) {
+	public function peekService( string $name ) {
 		if ( !$this->hasService( $name ) ) {
 			throw new NoSuchServiceException( $name );
 		}
@@ -224,7 +224,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	/**
 	 * @return string[]
 	 */
-	public function getServiceNames() {
+	public function getServiceNames(): array {
 		return array_keys( $this->serviceInstantiators );
 	}
 
@@ -339,7 +339,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @throws RuntimeException if $name is not a known service.
 	 */
-	public function disableService( $name ) {
+	public function disableService( string $name ) {
 		$this->resetService( $name );
 
 		$this->disabled[$name] = true;
@@ -368,7 +368,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @throws RuntimeException if $name is not a known service.
 	 */
-	final protected function resetService( string $name, $destroy = true ) {
+	final protected function resetService( string $name, bool $destroy = true ) {
 		$instance = $this->peekService( $name );
 
 		if ( $destroy && $instance instanceof DestructibleService ) {
@@ -380,7 +380,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	}
 
 	/**
-	 * Returns a service object of the kind associated with $name.
+	 * Returns a service of the kind associated with $name.
 	 * Services instances are instantiated lazily, on demand.
 	 * This method may or may not return the same service instance
 	 * when called multiple times with the same $name.
@@ -398,7 +398,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @throws ServiceDisabledException if the requested service has been disabled.
 	 * @return mixed The service instance
 	 */
-	public function getService( $name ) {
+	public function getService( string $name ) {
 		if ( $this->destroyed ) {
 			throw new ContainerDisabledException();
 		}
@@ -415,7 +415,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	}
 
 	/** @inheritDoc */
-	public function get( $name ) {
+	public function get( string $name ) {
 		return $this->getService( $name );
 	}
 
@@ -424,7 +424,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *
 	 * @throws NoSuchServiceException if $name is not a known service.
 	 * @throws RecursiveServiceDependencyException if a circular dependency is detected.
-	 * @return object
+	 * @return mixed
 	 */
 	private function createService( string $name ) {
 		if ( !isset( $this->serviceInstantiators[$name] ) ) {
@@ -450,9 +450,8 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 			foreach ( $this->serviceManipulators[$name] as $manipulator ) {
 				$ret = $manipulator( $service, $this, ...$this->extraInstantiationParams );
 
-				// If the manipulator callback returns an object, that object replaces
-				// the original service instance. This allows the manipulator to wrap
-				// or fully replace the service.
+				// If the manipulator callback returns a value, that replaces the original service.
+				// This allows the manipulator to wrap or fully replace the service.
 				if ( $ret !== null ) {
 					$service = $ret;
 				}
@@ -470,7 +469,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @return bool Whether the service is disabled
 	 * @since 1.28
 	 */
-	public function isServiceDisabled( $name ) {
+	public function isServiceDisabled( string $name ): bool {
 		return isset( $this->disabled[$name] );
 	}
 }

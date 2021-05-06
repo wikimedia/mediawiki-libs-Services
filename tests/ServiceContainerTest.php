@@ -8,7 +8,7 @@ use Wikimedia\Services\ServiceContainer;
  */
 class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
-	private function newServiceContainer( $extraArgs = [] ) {
+	private function newServiceContainer( array $extraArgs = [] ): ServiceContainer {
 		return new ServiceContainer( $extraArgs );
 	}
 
@@ -16,8 +16,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services = $this->newServiceContainer();
 		$names = $services->getServiceNames();
 
-		$this->assertIsArray( $names );
-		$this->assertEmpty( $names );
+		$this->assertSame( [], $names );
 
 		$name = 'TestService92834576';
 		$services->defineService( $name, static function () {
@@ -44,7 +43,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testGetService() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 		$count = 0;
 
@@ -108,14 +107,14 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services->defineService(
 			'Foo',
 			static function () {
-				return new stdClass();
+				return (object)[];
 			}
 		);
 
 		$services->defineService(
 			'Bar',
 			static function () {
-				return new stdClass();
+				return (object)[];
 			}
 		);
 
@@ -123,7 +122,6 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services->getService( 'Foo' );
 
 		$this->assertIsObject(
-
 			$services->peekService( 'Foo' ),
 			'Peek should return the service object if it had been accessed before.'
 		);
@@ -147,7 +145,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDefineService() {
 		$services = $this->newServiceContainer();
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService( $name, function ( $actualLocator ) use ( $services, $theService ) {
@@ -162,7 +160,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDefineService_fail_duplicate() {
 		$services = $this->newServiceContainer();
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService( $name, static function () use ( $theService ) {
@@ -317,7 +315,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testRedefineService() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$theService1 = new stdClass();
+		$theService1 = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService( $name, function () {
@@ -343,7 +341,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testRedefineService_disabled() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$theService1 = new stdClass();
+		$theService1 = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService( $name, static function () {
@@ -364,7 +362,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testRedefineService_fail_undefined() {
 		$services = $this->newServiceContainer();
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
@@ -377,7 +375,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testRedefineService_fail_in_use() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService( $name, static function () {
@@ -397,8 +395,8 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testAddServiceManipulator() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$theService1 = new stdClass();
-		$theService2 = new stdClass();
+		$theService1 = (object)[];
+		$theService2 = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService(
@@ -431,7 +429,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testAddServiceManipulator_fail_undefined() {
 		$services = $this->newServiceContainer();
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
@@ -444,7 +442,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testAddServiceManipulator_fail_in_use() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$services->defineService( $name, static function () use ( $theService ) {
@@ -464,8 +462,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDisableService() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$destructible = $this->getMockBuilder( Wikimedia\Services\DestructibleService::class )
-			->getMock();
+		$destructible = $this->createMock( Wikimedia\Services\DestructibleService::class );
 		$destructible->expects( $this->once() )
 			->method( 'destroy' );
 
@@ -473,10 +470,10 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 			return $destructible;
 		} );
 		$services->defineService( 'Bar', static function () {
-			return new stdClass();
+			return (object)[];
 		} );
 		$services->defineService( 'Qux', static function () {
-			return new stdClass();
+			return (object)[];
 		} );
 
 		// instantiate Foo and Bar services
@@ -510,7 +507,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDisableService_fail_undefined() {
 		$services = $this->newServiceContainer();
 
-		$theService = new stdClass();
+		$theService = (object)[];
 		$name = 'TestService92834576';
 
 		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
@@ -523,8 +520,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDestroy() {
 		$services = $this->newServiceContainer();
 
-		$destructible = $this->getMockBuilder( Wikimedia\Services\DestructibleService::class )
-			->getMock();
+		$destructible = $this->createMock( Wikimedia\Services\DestructibleService::class );
 		$destructible->expects( $this->once() )
 			->method( 'destroy' );
 
@@ -533,7 +529,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		} );
 
 		$services->defineService( 'Bar', static function () {
-			return new stdClass();
+			return (object)[];
 		} );
 
 		// create the service
