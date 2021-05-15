@@ -4,7 +4,7 @@
  */
 
 return (object)[
-	'Foo' => function () {
+	'Foo' => static function () {
 		return 'Foo!';
 	},
 ];

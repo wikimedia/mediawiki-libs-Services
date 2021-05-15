@@ -20,7 +20,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$this->assertEmpty( $names );
 
 		$name = 'TestService92834576';
-		$services->defineService( $name, function () {
+		$services->defineService( $name, static function () {
 			return null;
 		} );
 
@@ -34,7 +34,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$name = 'TestService92834576';
 		$this->assertFalse( $services->hasService( $name ) );
 
-		$services->defineService( $name, function () {
+		$services->defineService( $name, static function () {
 			return null;
 		} );
 
@@ -67,15 +67,15 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testGetServiceRecursionCheck() {
 		$services = $this->newServiceContainer();
 
-		$services->defineService( 'service1', function ( ServiceContainer $services ) {
+		$services->defineService( 'service1', static function ( ServiceContainer $services ) {
 			$services->getService( 'service2' );
 		} );
 
-		$services->defineService( 'service2', function ( ServiceContainer $services ) {
+		$services->defineService( 'service2', static function ( ServiceContainer $services ) {
 			$services->getService( 'service3' );
 		} );
 
-		$services->defineService( 'service3', function ( ServiceContainer $services ) {
+		$services->defineService( 'service3', static function ( ServiceContainer $services ) {
 			$services->getService( 'service1' );
 		} );
 
@@ -107,14 +107,14 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$services->defineService(
 			'Foo',
-			function () {
+			static function () {
 				return new stdClass();
 			}
 		);
 
 		$services->defineService(
 			'Bar',
-			function () {
+			static function () {
 				return new stdClass();
 			}
 		);
@@ -165,13 +165,13 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService = new stdClass();
 		$name = 'TestService92834576';
 
-		$services->defineService( $name, function () use ( $theService ) {
+		$services->defineService( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 
 		$this->expectException( Wikimedia\Services\ServiceAlreadyDefinedException::class );
 
-		$services->defineService( $name, function () use ( $theService ) {
+		$services->defineService( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 	}
@@ -180,10 +180,10 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services = $this->newServiceContainer();
 
 		$wiring = [
-			'Foo' => function () {
+			'Foo' => static function () {
 				return 'Foo!';
 			},
-			'Bar' => function () {
+			'Bar' => static function () {
 				return 'Bar!';
 			},
 		];
@@ -198,7 +198,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services = $this->newServiceContainer();
 
 		$wiring = [
-			'Foo' => function () {
+			'Foo' => static function () {
 				return 'Foo!';
 			},
 			'Bar' => 'not a function',
@@ -212,41 +212,41 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$services = $this->newServiceContainer();
 
 		$wiring = [
-			'Foo' => function () {
+			'Foo' => static function () {
 				return 'Foo!';
 			},
-			'Bar' => function () {
+			'Bar' => static function () {
 				return 'Bar!';
 			},
-			'Car' => function () {
+			'Car' => static function () {
 				return 'FUBAR!';
 			},
 		];
 
 		$services->applyWiring( $wiring );
 
-		$services->addServiceManipulator( 'Foo', function ( $service ) {
+		$services->addServiceManipulator( 'Foo', static function ( $service ) {
 			return $service . '+X';
 		} );
 
-		$services->addServiceManipulator( 'Car', function ( $service ) {
+		$services->addServiceManipulator( 'Car', static function ( $service ) {
 			return $service . '+X';
 		} );
 
 		$newServices = $this->newServiceContainer();
 
 		// create a service with manipulator
-		$newServices->defineService( 'Foo', function () {
+		$newServices->defineService( 'Foo', static function () {
 			return 'Foo!';
 		} );
 
-		$newServices->addServiceManipulator( 'Foo', function ( $service ) {
+		$newServices->addServiceManipulator( 'Foo', static function ( $service ) {
 			return $service . '+Y';
 		} );
 
 		// create a service before importing, so we can later check that
 		// existing service instances survive importWiring()
-		$newServices->defineService( 'Car', function () {
+		$newServices->defineService( 'Car', static function () {
 			return 'Car!';
 		} );
 
@@ -255,7 +255,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		// Define another service, so we can later check that extra wiring
 		// is not lost.
-		$newServices->defineService( 'Xar', function () {
+		$newServices->defineService( 'Xar', static function () {
 			return 'Xar!';
 		} );
 
@@ -346,14 +346,14 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService1 = new stdClass();
 		$name = 'TestService92834576';
 
-		$services->defineService( $name, function () {
+		$services->defineService( $name, static function () {
 			return 'Foo';
 		} );
 
 		// disable the service. we should be able to redefine it anyway.
 		$services->disableService( $name );
 
-		$services->redefineService( $name, function () use ( $theService1 ) {
+		$services->redefineService( $name, static function () use ( $theService1 ) {
 			return $theService1;
 		} );
 
@@ -369,7 +369,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
 
-		$services->redefineService( $name, function () use ( $theService ) {
+		$services->redefineService( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 	}
@@ -380,7 +380,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService = new stdClass();
 		$name = 'TestService92834576';
 
-		$services->defineService( $name, function () {
+		$services->defineService( $name, static function () {
 			return 'Foo';
 		} );
 
@@ -389,7 +389,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$this->expectException( Wikimedia\Services\CannotReplaceActiveServiceException::class );
 
-		$services->redefineService( $name, function () use ( $theService ) {
+		$services->redefineService( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 	}
@@ -436,7 +436,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
 
-		$services->addServiceManipulator( $name, function () use ( $theService ) {
+		$services->addServiceManipulator( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 	}
@@ -447,7 +447,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService = new stdClass();
 		$name = 'TestService92834576';
 
-		$services->defineService( $name, function () use ( $theService ) {
+		$services->defineService( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 
@@ -456,7 +456,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$this->expectException( Wikimedia\Services\CannotReplaceActiveServiceException::class );
 
-		$services->addServiceManipulator( $name, function () {
+		$services->addServiceManipulator( $name, static function () {
 			return 'Foo';
 		} );
 	}
@@ -469,13 +469,13 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$destructible->expects( $this->once() )
 			->method( 'destroy' );
 
-		$services->defineService( 'Foo', function () use ( $destructible ) {
+		$services->defineService( 'Foo', static function () use ( $destructible ) {
 			return $destructible;
 		} );
-		$services->defineService( 'Bar', function () {
+		$services->defineService( 'Bar', static function () {
 			return new stdClass();
 		} );
-		$services->defineService( 'Qux', function () {
+		$services->defineService( 'Qux', static function () {
 			return new stdClass();
 		} );
 
@@ -515,7 +515,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
 
-		$services->redefineService( $name, function () use ( $theService ) {
+		$services->redefineService( $name, static function () use ( $theService ) {
 			return $theService;
 		} );
 	}
@@ -528,11 +528,11 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$destructible->expects( $this->once() )
 			->method( 'destroy' );
 
-		$services->defineService( 'Foo', function () use ( $destructible ) {
+		$services->defineService( 'Foo', static function () use ( $destructible ) {
 			return $destructible;
 		} );
 
-		$services->defineService( 'Bar', function () {
+		$services->defineService( 'Bar', static function () {
 			return new stdClass();
 		} );
 
