@@ -19,7 +19,7 @@
 	},
 	"require": {
 		"php": ">=7.2.9",
-		"psr/container": "^1.0.0",
+		"psr/container": "^1.1",
 		"wikimedia/scoped-callback": "^3.0"
 	},
 	"require-dev": {
