@@ -97,9 +97,8 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @see MediaWikiServices::resetGlobalInstance()
 	 */
 	public function destroy() {
-		foreach ( $this->getServiceNames() as $name ) {
-			$service = $this->peekService( $name );
-			if ( $service !== null && $service instanceof DestructibleService ) {
+		foreach ( $this->services as $service ) {
+			if ( $service instanceof DestructibleService ) {
 				$service->destroy();
 			}
 		}
@@ -336,8 +335,6 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @see resetService()
 	 *
 	 * @param string $name The name of the service to disable.
-	 *
-	 * @throws RuntimeException if $name is not a known service.
 	 */
 	public function disableService( string $name ) {
 		$this->resetService( $name );
@@ -365,11 +362,9 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @param bool $destroy Whether the service instance should be destroyed if it exists.
 	 *        When set to false, any existing service instance will effectively be detached
 	 *        from the container.
-	 *
-	 * @throws RuntimeException if $name is not a known service.
 	 */
 	final protected function resetService( string $name, bool $destroy = true ) {
-		$instance = $this->peekService( $name );
+		$instance = $this->services[$name] ?? null;
 
 		if ( $destroy && $instance instanceof DestructibleService ) {
 			$instance->destroy();
