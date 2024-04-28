@@ -1,10 +1,3 @@
 <?php
-$cfg = require __DIR__ . '/../vendor/mediawiki/mediawiki-phan-config/src/config-library.php';
 
-$cfg['directory_list'] = [
-	'src',
-	'vendor/psr/container',
-	'vendor/wikimedia/scoped-callback',
-];
-
-return $cfg;
+return require __DIR__ . '/../vendor/mediawiki/mediawiki-phan-config/src/config-library.php';

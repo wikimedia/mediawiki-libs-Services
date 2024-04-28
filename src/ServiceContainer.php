@@ -344,7 +344,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 
 	/**
 	 * Resets a service by dropping the service instance.
-	 * If the service instances implements DestructibleService, destroy()
+	 * If the service instance implements DestructibleService, destroy()
 	 * is called on the service instance.
 	 *
 	 * @warning This is generally unsafe! Other services may still retain references

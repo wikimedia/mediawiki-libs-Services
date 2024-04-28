@@ -1,12 +1,21 @@
 <?php
 
+namespace Wikimedia\Services\Tests;
+
+use PHPUnit\Framework\TestCase;
+use Wikimedia\Services\CannotReplaceActiveServiceException;
+use Wikimedia\Services\ContainerDisabledException;
+use Wikimedia\Services\DestructibleService;
+use Wikimedia\Services\NoSuchServiceException;
 use Wikimedia\Services\RecursiveServiceDependencyException;
+use Wikimedia\Services\ServiceAlreadyDefinedException;
 use Wikimedia\Services\ServiceContainer;
+use Wikimedia\Services\ServiceDisabledException;
 
 /**
- * @covers Wikimedia\Services\ServiceContainer
+ * @covers \Wikimedia\Services\ServiceContainer
  */
-class ServiceContainerTest extends PHPUnit\Framework\TestCase {
+class ServiceContainerTest extends TestCase {
 
 	private function newServiceContainer( array $extraArgs = [] ): ServiceContainer {
 		return new ServiceContainer( $extraArgs );
@@ -96,7 +105,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$name = 'TestService92834576';
 
-		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
+		$this->expectException( NoSuchServiceException::class );
 
 		$services->getService( $name );
 	}
@@ -137,7 +146,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 
 		$name = 'TestService92834576';
 
-		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
+		$this->expectException( NoSuchServiceException::class );
 
 		$services->peekService( $name );
 	}
@@ -167,7 +176,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 			return $theService;
 		} );
 
-		$this->expectException( Wikimedia\Services\ServiceAlreadyDefinedException::class );
+		$this->expectException( ServiceAlreadyDefinedException::class );
 
 		$services->defineService( $name, static function () use ( $theService ) {
 			return $theService;
@@ -295,7 +304,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		];
 
 		// loading the same file twice should fail, because
-		$this->expectException( Wikimedia\Services\ServiceAlreadyDefinedException::class );
+		$this->expectException( ServiceAlreadyDefinedException::class );
 
 		$services->loadWiringFiles( $wiringFiles );
 	}
@@ -365,7 +374,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService = (object)[];
 		$name = 'TestService92834576';
 
-		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
+		$this->expectException( NoSuchServiceException::class );
 
 		$services->redefineService( $name, static function () use ( $theService ) {
 			return $theService;
@@ -385,7 +394,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		// create the service, so it can no longer be redefined
 		$services->getService( $name );
 
-		$this->expectException( Wikimedia\Services\CannotReplaceActiveServiceException::class );
+		$this->expectException( CannotReplaceActiveServiceException::class );
 
 		$services->redefineService( $name, static function () use ( $theService ) {
 			return $theService;
@@ -432,7 +441,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService = (object)[];
 		$name = 'TestService92834576';
 
-		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
+		$this->expectException( NoSuchServiceException::class );
 
 		$services->addServiceManipulator( $name, static function () use ( $theService ) {
 			return $theService;
@@ -452,7 +461,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		// create the service, so it can no longer be redefined
 		$services->getService( $name );
 
-		$this->expectException( Wikimedia\Services\CannotReplaceActiveServiceException::class );
+		$this->expectException( CannotReplaceActiveServiceException::class );
 
 		$services->addServiceManipulator( $name, static function () {
 			return 'Foo';
@@ -462,7 +471,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDisableService() {
 		$services = $this->newServiceContainer( [ 'Foo' ] );
 
-		$destructible = $this->createMock( Wikimedia\Services\DestructibleService::class );
+		$destructible = $this->createMock( DestructibleService::class );
 		$destructible->expects( $this->once() )
 			->method( 'destroy' );
 
@@ -500,7 +509,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$this->assertContains( 'Bar', $services->getServiceNames() );
 		$this->assertContains( 'Qux', $services->getServiceNames() );
 
-		$this->expectException( Wikimedia\Services\ServiceDisabledException::class );
+		$this->expectException( ServiceDisabledException::class );
 		$services->getService( 'Qux' );
 	}
 
@@ -510,7 +519,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		$theService = (object)[];
 		$name = 'TestService92834576';
 
-		$this->expectException( Wikimedia\Services\NoSuchServiceException::class );
+		$this->expectException( NoSuchServiceException::class );
 
 		$services->redefineService( $name, static function () use ( $theService ) {
 			return $theService;
@@ -520,7 +529,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 	public function testDestroy() {
 		$services = $this->newServiceContainer();
 
-		$destructible = $this->createMock( Wikimedia\Services\DestructibleService::class );
+		$destructible = $this->createMock( DestructibleService::class );
 		$destructible->expects( $this->once() )
 			->method( 'destroy' );
 
@@ -538,7 +547,7 @@ class ServiceContainerTest extends PHPUnit\Framework\TestCase {
 		// destroy the container
 		$services->destroy();
 
-		$this->expectException( Wikimedia\Services\ContainerDisabledException::class );
+		$this->expectException( ContainerDisabledException::class );
 		$services->getService( 'Bar' );
 	}
 
