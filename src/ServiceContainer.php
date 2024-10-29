@@ -453,7 +453,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 			}
 		}
 
-		$removeFromStack->consume();
+		ScopedCallback::consume( $removeFromStack );
 		// NOTE: when adding more wiring logic here, make sure importWiring() is kept in sync!
 
 		return $service;
