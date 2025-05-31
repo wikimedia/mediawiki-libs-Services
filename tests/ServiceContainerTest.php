@@ -14,6 +14,12 @@ use Wikimedia\Services\ServiceDisabledException;
 
 /**
  * @covers \Wikimedia\Services\ServiceContainer
+ * @covers \Wikimedia\Services\CannotReplaceActiveServiceException
+ * @covers \Wikimedia\Services\ContainerDisabledException
+ * @covers \Wikimedia\Services\NoSuchServiceException
+ * @covers \Wikimedia\Services\RecursiveServiceDependencyException
+ * @covers \Wikimedia\Services\ServiceAlreadyDefinedException
+ * @covers \Wikimedia\Services\ServiceDisabledException
  */
 class ServiceContainerTest extends TestCase {
 
