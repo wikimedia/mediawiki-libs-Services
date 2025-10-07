@@ -24,7 +24,6 @@ namespace Wikimedia\Services;
 
 use LogicException;
 use Psr\Container\ContainerInterface;
-use RuntimeException;
 use Wikimedia\ScopedCallback;
 
 /**
@@ -210,7 +209,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @param string $name
 	 *
 	 * @return mixed|null The service instance, or null if the service has not yet been instantiated.
-	 * @throws RuntimeException if $name does not refer to a known service.
+	 * @throws NoSuchServiceException if $name does not refer to a known service.
 	 */
 	public function peekService( string $name ) {
 		if ( !$this->hasService( $name ) ) {
@@ -239,7 +238,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 *        Any extra instantiation parameters provided to the constructor will be
 	 *        passed as subsequent parameters when invoking the instantiator.
 	 *
-	 * @throws RuntimeException if there is already a service registered as $name.
+	 * @throws ServiceAlreadyDefinedException if there is already a service registered as $name.
 	 */
 	public function defineService( string $name, callable $instantiator ) {
 		if ( $this->hasService( $name ) ) {
