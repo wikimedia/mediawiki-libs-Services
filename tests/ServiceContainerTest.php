@@ -47,12 +47,14 @@ class ServiceContainerTest extends TestCase {
 
 		$name = 'TestService92834576';
 		$this->assertFalse( $services->hasService( $name ) );
+		$this->assertFalse( $services->has( $name ) );
 
 		$services->defineService( $name, static function () {
 			return null;
 		} );
 
 		$this->assertTrue( $services->hasService( $name ) );
+		$this->assertTrue( $services->has( $name ) );
 	}
 
 	public function testGetService() {
@@ -73,6 +75,7 @@ class ServiceContainerTest extends TestCase {
 		);
 
 		$this->assertSame( $theService, $services->getService( $name ) );
+		$this->assertSame( $theService, $services->get( $name ) );
 
 		$services->getService( $name );
 		$this->assertSame( 1, $count, 'instantiator should be called exactly once!' );
@@ -497,6 +500,7 @@ class ServiceContainerTest extends TestCase {
 
 		// disable service, should call destroy() once.
 		$services->disableService( 'Foo' );
+		$this->assertTrue( $services->isServiceDisabled( 'Foo' ) );
 
 		// disabled service should still be listed
 		$this->assertContains( 'Foo', $services->getServiceNames() );
@@ -506,7 +510,9 @@ class ServiceContainerTest extends TestCase {
 
 		// disable non-destructible service, and not-yet-instantiated service
 		$services->disableService( 'Bar' );
+		$this->assertTrue( $services->isServiceDisabled( 'Bar' ) );
 		$services->disableService( 'Qux' );
+		$this->assertTrue( $services->isServiceDisabled( 'Qux' ) );
 
 		$this->assertNull( $services->peekService( 'Bar' ) );
 		$this->assertNull( $services->peekService( 'Qux' ) );
