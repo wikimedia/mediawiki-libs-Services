@@ -1,4 +1,6 @@
 <?php
+declare( strict_types = 1 );
+
 /**
  * Exception thrown when a service was already defined, but the
  * caller expected it to not exist.

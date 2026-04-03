@@ -1,4 +1,6 @@
 <?php
+declare( strict_types = 1 );
+
 /**
  * Exception thrown when trying to replace an already active service.
  *
