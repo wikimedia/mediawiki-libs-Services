@@ -32,22 +32,22 @@ use Wikimedia\ScopedCallback;
 class ServiceContainer implements ContainerInterface, DestructibleService {
 
 	/**
-	 * @var mixed[]
+	 * @var array<string,mixed>
 	 */
 	private $services = [];
 
 	/**
-	 * @var callable[]
+	 * @var array<string,callable>
 	 */
 	private $serviceInstantiators = [];
 
 	/**
-	 * @var callable[][]
+	 * @var array<string,callable[]>
 	 */
 	private $serviceManipulators = [];
 
 	/**
-	 * @var true[] Set of services that got disabled via {@see disableService}
+	 * @var array<string,true> Set of services that got disabled via {@see disableService}
 	 */
 	private $disabled = [];
 
@@ -62,7 +62,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	private $destroyed = false;
 
 	/**
-	 * @var true[] Set of services currently being created, to detect loops
+	 * @var array<string,true> Set of services currently being created, to detect loops
 	 */
 	private $servicesBeingCreated = [];
 
@@ -120,7 +120,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	/**
 	 * Registers multiple services (aka a "wiring").
 	 *
-	 * @param callable[] $serviceInstantiators An associative array mapping service names to
+	 * @param array<string,callable> $serviceInstantiators An associative array mapping service names to
 	 *        instantiator functions.
 	 */
 	public function applyWiring( array $serviceInstantiators ) {
