@@ -238,6 +238,9 @@ class ServiceContainerTest extends TestCase {
 			'Car' => static function () {
 				return 'FUBAR!';
 			},
+			'123' => static function () {
+				return '123!';
+			},
 		];
 
 		$services->applyWiring( $wiring );
@@ -249,6 +252,9 @@ class ServiceContainerTest extends TestCase {
 		$services->addServiceManipulator( 'Car', static function ( $service ) {
 			return $service . '+X';
 		} );
+
+		$this->assertContains( '123', $services->getServiceNames(), 'Numeric services' );
+		$this->assertSame( '123!', $services->getService( '123' ) );
 
 		$newServices = $this->newServiceContainer();
 

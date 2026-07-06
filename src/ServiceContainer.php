@@ -125,7 +125,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 */
 	public function applyWiring( array $serviceInstantiators ) {
 		foreach ( $serviceInstantiators as $name => $instantiator ) {
-			$this->defineService( $name, $instantiator );
+			$this->defineService( (string)$name, $instantiator );
 		}
 	}
 
@@ -211,7 +211,7 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 	 * @return string[]
 	 */
 	public function getServiceNames(): array {
-		return array_keys( $this->serviceInstantiators );
+		return array_map( strval( ... ), array_keys( $this->serviceInstantiators ) );
 	}
 
 	/**
