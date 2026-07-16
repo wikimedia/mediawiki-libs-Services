@@ -12,7 +12,6 @@ namespace Wikimedia\Services;
 
 use LogicException;
 use Psr\Container\ContainerInterface;
-use Wikimedia\ScopedCallback;
 
 /**
  * ServiceContainer provides a generic service to manage named services using
@@ -420,29 +419,29 @@ class ServiceContainer implements ContainerInterface, DestructibleService {
 		}
 
 		$this->servicesBeingCreated[$name] = true;
-		$removeFromStack = new ScopedCallback( function () use ( $name ) {
-			unset( $this->servicesBeingCreated[$name] );
-		} );
+		try {
+			$service = ( $this->serviceInstantiators[$name] )(
+				$this,
+				...$this->extraInstantiationParams
+			);
+			if ( isset( $this->serviceManipulators[$name] ) ) {
+				foreach ( $this->serviceManipulators[$name] as $manipulator ) {
+					$ret = $manipulator( $service, $this, ...$this->extraInstantiationParams );
 
-		$service = ( $this->serviceInstantiators[$name] )(
-			$this,
-			...$this->extraInstantiationParams
-		);
-		if ( isset( $this->serviceManipulators[$name] ) ) {
-			foreach ( $this->serviceManipulators[$name] as $manipulator ) {
-				$ret = $manipulator( $service, $this, ...$this->extraInstantiationParams );
-
-				// If the manipulator callback returns a value, that replaces the original service.
-				// This allows the manipulator to wrap or fully replace the service.
-				if ( $ret !== null ) {
-					$service = $ret;
+					// If the manipulator callback returns a value, that replaces the original service.
+					// This allows the manipulator to wrap or fully replace the service.
+					if ( $ret !== null ) {
+						$service = $ret;
+					}
 				}
 			}
+		} finally {
+			unset( $this->servicesBeingCreated[$name] );
 		}
 
-		ScopedCallback::consume( $removeFromStack );
 		// NOTE: when adding more wiring logic here, make sure importWiring() is kept in sync!
 
+		// @phan-suppress-next-line PhanPossiblyUndeclaredVariable Bug https://github.com/phan/phan/issues/4419
 		return $service;
 	}
 
